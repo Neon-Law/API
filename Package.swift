@@ -30,6 +30,10 @@ let package = Package(
             url: "https://github.com/soto-project/soto.git",
             from: "7.3.0"
         ),
+        .package(
+            url: "https://github.com/swiftlang/swift-format.git",
+            from: "600.0.0"
+        ),
     ],
     targets: [
         .executableTarget(
