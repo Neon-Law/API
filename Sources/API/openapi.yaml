@@ -1,0 +1,119 @@
+openapi: 3.0.3
+info:
+  title: Neon Law Matters API
+  description: API for retrieving matter repositories for authenticated attorneys
+  version: 1.0.0
+  contact:
+    name: Neon Law
+    url: https://neonlaw.com
+
+servers:
+  - url: /
+    description: Local development and API Gateway
+
+paths:
+  /matters:
+    get:
+      summary: Get matters list
+      description: |
+        Returns a list of all matters (CodeCommit repositories) that the
+        authenticated user has access to. Each matter includes the matter
+        name and corresponding Git repository URL for cloning.
+      operationId: getMatters
+      tags:
+        - Matters
+      responses:
+        '200':
+          description: Successfully retrieved matters list
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MattersResponse'
+              examples:
+                multipleMatters:
+                  summary: User with multiple matters
+                  value:
+                    matters:
+                      - name: SmithVJones
+                        gitUrl: https://git-codecommit.us-west-2.amazonaws.com/v1/repos/SmithVJones
+                      - name: AcmeCorp-Formation
+                        gitUrl: https://git-codecommit.us-west-2.amazonaws.com/v1/repos/AcmeCorp-Formation
+                      - name: JohnsonEstate
+                        gitUrl: https://git-codecommit.us-west-2.amazonaws.com/v1/repos/JohnsonEstate
+                noMatters:
+                  summary: User with no matters
+                  value:
+                    matters: []
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                error:
+                  code: internal_error
+                  message: An unexpected error occurred
+
+components:
+  schemas:
+    MattersResponse:
+      type: object
+      required:
+        - matters
+      properties:
+        matters:
+          type: array
+          description: List of matters accessible to the authenticated user
+          items:
+            $ref: '#/components/schemas/Matter'
+
+    Matter:
+      type: object
+      required:
+        - name
+        - gitUrl
+      properties:
+        name:
+          type: string
+          description: |
+            The matter name, which corresponds to the CodeCommit repository name.
+            Must be unique within the AWS account and follow CodeCommit naming
+            conventions (max 100 characters, alphanumeric, dash, underscore only).
+          pattern: '[\w\.-]+'
+          maxLength: 100
+          example: SmithVJones
+        gitUrl:
+          type: string
+          format: uri
+          description: |
+            Standard Git HTTPS URL for cloning the CodeCommit repository.
+            Format: https://git-codecommit.<region>.amazonaws.com/v1/repos/<name>
+          pattern: '^https://git-codecommit\.[a-z0-9-]+\.amazonaws\.com/v1/repos/[\w\.-]+$'
+          example: https://git-codecommit.us-west-2.amazonaws.com/v1/repos/SmithVJones
+
+    ErrorResponse:
+      type: object
+      required:
+        - error
+      properties:
+        error:
+          type: object
+          required:
+            - code
+            - message
+          properties:
+            code:
+              type: string
+              description: Machine-readable error code
+              enum:
+                - internal_error
+              example: internal_error
+            message:
+              type: string
+              description: Human-readable error message
+              example: An unexpected error occurred
+
+tags:
+  - name: Matters
+    description: Operations related to legal matters and their repositories
