@@ -40,7 +40,7 @@ jobs:
             spm-${{ runner.os }}-
 
       - name: Run Swift Build (Strict - Fail on Warnings)
-        run: swift build --jobs 1 -Xswiftc -warnings-as-errors
+        run: swift build -Xswiftc -warnings-as-errors
 
       - name: Run tests
         run: swift test
