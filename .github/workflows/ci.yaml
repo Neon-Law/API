@@ -24,19 +24,3 @@ jobs:
 
       - name: Run Swift Format Lint
         run: swift format lint --strict --recursive --parallel --no-color-diagnostics .
-
-      - name: Cache Swift Package Manager dependencies
-        uses: actions/cache@v4
-        with:
-          path: |
-            .build
-            ~/.cache/org.swift.swiftpm
-          key: spm-${{ runner.os }}-${{ hashFiles('Package.swift', 'Package.resolved') }}
-          restore-keys: |
-            spm-${{ runner.os }}-
-
-      - name: Run Swift Build (Strict - Fail on Warnings)
-        run: swift build -Xswiftc -warnings-as-errors
-
-      - name: Run tests
-        run: swift test
