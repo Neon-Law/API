@@ -1,0 +1,62 @@
+# AWS CodeBuild buildspec for NeonLaw API Lambda
+# Environment variables expected:
+# - S3_BUCKET: Target S3 bucket for deployment artifacts
+# - LAMBDA_FUNCTION_NAME: Name of the Lambda function to update
+# - AWS_REGION: AWS region for deployment
+
+version: 0.2
+
+phases:
+  install:
+    commands:
+      - echo "Installing Swift toolchain for Amazon Linux 2023 ARM64..."
+      - curl -LO https://download.swift.org/swift-6.0-release/amazonlinux2/swift-6.0-RELEASE/swift-6.0-RELEASE-amazonlinux2.tar.gz
+      - tar xzf swift-6.0-RELEASE-amazonlinux2.tar.gz
+      - export PATH=$(pwd)/swift-6.0-RELEASE-amazonlinux2/usr/bin:$PATH
+      - swift --version
+
+  pre_build:
+    commands:
+      - echo "Resolving Swift package dependencies..."
+      - swift package resolve
+
+  build:
+    commands:
+      - echo "Building API Lambda for ARM64 (Graviton)..."
+      - swift build -c release
+
+      - echo "Creating Lambda deployment package..."
+      - mkdir -p .build/lambda
+      - cp .build/release/API .build/lambda/bootstrap
+      - cd .build/lambda
+      - zip -r bootstrap.zip bootstrap
+      - cd ../..
+
+      - echo "Deployment package created at .build/lambda/bootstrap.zip"
+      - ls -lh .build/lambda/bootstrap.zip
+
+  post_build:
+    commands:
+      - echo "Uploading to S3 bucket $S3_BUCKET..."
+      - aws s3 cp .build/lambda/bootstrap.zip "s3://${S3_BUCKET}/api/bootstrap.zip"
+
+      - echo "Updating Lambda function $LAMBDA_FUNCTION_NAME..."
+      - |
+        aws lambda update-function-code \
+          --function-name "$LAMBDA_FUNCTION_NAME" \
+          --s3-bucket "$S3_BUCKET" \
+          --s3-key "api/bootstrap.zip" \
+          --region "$AWS_REGION"
+
+      - echo "Waiting for Lambda function update to complete..."
+      - |
+        aws lambda wait function-updated \
+          --function-name "$LAMBDA_FUNCTION_NAME" \
+          --region "$AWS_REGION"
+
+      - echo "Lambda function updated successfully!"
+
+cache:
+  paths:
+    - '.build/**/*'
+    - '.build/checkouts/**/*'
