@@ -12,7 +12,8 @@ struct APILocalServer {
         try await codeCommitService.connect()
 
         let keys = try await buildJWTKeyCollection()
-        let fluent = try buildDatabase(env: env)
+        let fluent = try await buildDatabase(env: env)
+        try await fluent.migrate()
         let api = APIImpl(codeCommitService: codeCommitService)
 
         let router = Router(context: APIRequestContext.self)

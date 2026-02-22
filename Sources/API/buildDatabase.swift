@@ -4,7 +4,7 @@ import Foundation
 import HummingbirdFluent
 import Logging
 
-func buildDatabase(env: String) throws -> Fluent {
+func buildDatabase(env: String) async throws -> Fluent {
     let logger = Logger(label: "fluent")
     let fluent = Fluent(logger: logger)
 
@@ -21,6 +21,14 @@ func buildDatabase(env: String) throws -> Fluent {
     default:
         fluent.databases.use(.sqlite(.memory), as: .sqlite)
     }
+
+    await fluent.migrations.add(
+        CreateUsersTable(),
+        CreateRolesTable(),
+        CreateUserRolesTable(),
+        CreatePermissionsTable(),
+        CreateDocumentsTable()
+    )
 
     return fluent
 }

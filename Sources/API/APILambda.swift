@@ -27,7 +27,7 @@ struct APILambda {
         try await codeCommitService.connect()
 
         let keys = try await buildJWTKeyCollection()
-        let fluent = try buildDatabase(env: env)
+        let fluent = try await buildDatabase(env: env)
         let router = Router(context: LambdaAPIRequestContext.self)
         router.add(middleware: CognitoAuthMiddleware(keys: keys))
         router.add(
@@ -41,7 +41,8 @@ struct APILambda {
         let api = APIImpl(codeCommitService: codeCommitService)
         try api.registerHandlers(on: router, serverURL: try Servers.Server1.url())
 
-        let lambda = APIGatewayV2LambdaFunction(router: router, services: [fluent])
+        var lambda = APIGatewayV2LambdaFunction(router: router, services: [fluent])
+        lambda.beforeLambdaStarts { try await fluent.migrate() }
         try await lambda.runService()
     }
 }
