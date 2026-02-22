@@ -27,6 +27,14 @@ let package = Package(
             from: "2.18.3"
         ),
         .package(
+            url: "https://github.com/hummingbird-project/hummingbird-lambda.git",
+            from: "2.0.2"
+        ),
+        .package(
+            url: "https://github.com/apple/swift-configuration.git",
+            from: "1.0.0"
+        ),
+        .package(
             url: "https://github.com/soto-project/soto.git",
             from: "7.3.0"
         ),
@@ -52,14 +60,19 @@ let package = Package(
                     package: "hummingbird"
                 ),
                 .product(
+                    name: "HummingbirdLambda",
+                    package: "hummingbird-lambda"
+                ),
+                .product(
+                    name: "Configuration",
+                    package: "swift-configuration"
+                ),
+                .product(
                     name: "SotoCodeCommit",
                     package: "soto"
                 ),
             ],
             path: "Sources/API",
-            swiftSettings: [
-                .unsafeFlags(["-parse-as-library"])
-            ],
             plugins: [
                 .plugin(
                     name: "OpenAPIGenerator",

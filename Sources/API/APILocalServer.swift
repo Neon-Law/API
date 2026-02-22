@@ -1,0 +1,26 @@
+import Hummingbird
+import OpenAPIHummingbird
+import OpenAPIRuntime
+
+struct APILocalServer {
+    static func run() async throws {
+        let codeCommitService = CodeCommitService()
+        try await codeCommitService.connect()
+
+        let api = APIImpl(codeCommitService: codeCommitService)
+
+        let router = Router()
+        try api.registerHandlers(on: router, serverURL: try Servers.Server1.url())
+
+        let app = Application(
+            router: router,
+            configuration: .init(address: .hostname("127.0.0.1", port: 8080)),
+            onServerRunning: { _ in
+                print("NeonLaw API running on http://127.0.0.1:8080")
+            }
+        )
+
+        try await app.runService()
+        try await codeCommitService.shutdown()
+    }
+}
