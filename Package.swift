@@ -120,6 +120,14 @@ let package = Package(
                     name: "HummingbirdTesting",
                     package: "hummingbird"
                 ),
+                .product(
+                    name: "JWTKit",
+                    package: "jwt-kit"
+                ),
+                .product(
+                    name: "HummingbirdFluent",
+                    package: "hummingbird-fluent"
+                ),
             ],
             path: "Tests"
         ),

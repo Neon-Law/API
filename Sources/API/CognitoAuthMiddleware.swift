@@ -15,7 +15,12 @@ struct CognitoAuthMiddleware<Context: AuthenticatedRequestContext>: RouterMiddle
             throw HTTPError(.unauthorized)
         }
         let token = String(authorization.dropFirst(7))
-        let payload = try await keys.verify(token, as: CognitoJWTPayload.self)
+        let payload: CognitoJWTPayload
+        do {
+            payload = try await keys.verify(token, as: CognitoJWTPayload.self)
+        } catch {
+            throw HTTPError(.unauthorized)
+        }
         var context = context
         context.cognitoUser = CognitoUser(
             sub: payload.sub.value,
