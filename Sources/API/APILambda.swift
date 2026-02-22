@@ -29,14 +29,8 @@ struct APILambda {
         let keys = try await buildJWTKeyCollection()
         let fluent = try await buildDatabase(env: env)
         let router = Router(context: LambdaAPIRequestContext.self)
-        router.add(middleware: CognitoAuthMiddleware(keys: keys))
-        router.add(
-            middleware: AuthorizationMiddleware(
-                fluent: fluent,
-                resource: "matters",
-                action: "read"
-            )
-        )
+        router.add(middleware: CognitoAuthMiddleware(keys: keys, fluent: fluent))
+        router.add(middleware: AuthorizationMiddleware(minimumRole: .customer))
 
         let api = APIImpl(codeCommitService: codeCommitService)
         try api.registerHandlers(on: router, serverURL: try Servers.Server1.url())

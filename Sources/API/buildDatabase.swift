@@ -23,11 +23,7 @@ func buildDatabase(env: String) async throws -> Fluent {
     }
 
     await fluent.migrations.add(
-        CreateUsersTable(),
-        CreateRolesTable(),
-        CreateUserRolesTable(),
-        CreatePermissionsTable(),
-        CreateDocumentsTable()
+        CreateUsersTable()
     )
 
     return fluent
