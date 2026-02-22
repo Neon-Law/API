@@ -7,9 +7,11 @@ struct APILocalServer {
         let codeCommitService = CodeCommitService()
         try await codeCommitService.connect()
 
+        let keys = try await buildJWTKeyCollection()
         let api = APIImpl(codeCommitService: codeCommitService)
 
-        let router = Router()
+        let router = Router(context: APIRequestContext.self)
+        router.add(middleware: CognitoAuthMiddleware(keys: keys))
         try api.registerHandlers(on: router, serverURL: try Servers.Server1.url())
 
         let app = Application(
