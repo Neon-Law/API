@@ -35,6 +35,18 @@ let package = Package(
             from: "1.0.0"
         ),
         .package(
+            url: "https://github.com/hummingbird-project/hummingbird-fluent.git",
+            from: "2.0.0"
+        ),
+        .package(
+            url: "https://github.com/vapor/fluent-sqlite-driver.git",
+            from: "4.8.1"
+        ),
+        .package(
+            url: "https://github.com/vapor/fluent-postgres-driver.git",
+            from: "2.12.0"
+        ),
+        .package(
             url: "https://github.com/soto-project/soto.git",
             from: "7.3.0"
         ),
@@ -66,6 +78,18 @@ let package = Package(
                 .product(
                     name: "Configuration",
                     package: "swift-configuration"
+                ),
+                .product(
+                    name: "HummingbirdFluent",
+                    package: "hummingbird-fluent"
+                ),
+                .product(
+                    name: "FluentSQLiteDriver",
+                    package: "fluent-sqlite-driver"
+                ),
+                .product(
+                    name: "FluentPostgresDriver",
+                    package: "fluent-postgres-driver"
                 ),
                 .product(
                     name: "SotoCodeCommit",
