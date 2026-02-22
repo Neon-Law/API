@@ -35,6 +35,10 @@ let package = Package(
             from: "1.0.0"
         ),
         .package(
+            url: "https://github.com/vapor/jwt-kit.git",
+            from: "5.0.0"
+        ),
+        .package(
             url: "https://github.com/hummingbird-project/hummingbird-fluent.git",
             from: "2.0.0"
         ),
@@ -78,6 +82,10 @@ let package = Package(
                 .product(
                     name: "Configuration",
                     package: "swift-configuration"
+                ),
+                .product(
+                    name: "JWTKit",
+                    package: "jwt-kit"
                 ),
                 .product(
                     name: "HummingbirdFluent",
