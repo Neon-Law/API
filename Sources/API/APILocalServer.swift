@@ -17,14 +17,8 @@ struct APILocalServer {
         let api = APIImpl(codeCommitService: codeCommitService)
 
         let router = Router(context: APIRequestContext.self)
-        router.add(middleware: CognitoAuthMiddleware(keys: keys))
-        router.add(
-            middleware: AuthorizationMiddleware(
-                fluent: fluent,
-                resource: "matters",
-                action: "read"
-            )
-        )
+        router.add(middleware: CognitoAuthMiddleware(keys: keys, fluent: fluent))
+        router.add(middleware: AuthorizationMiddleware(minimumRole: .customer))
         try api.registerHandlers(on: router, serverURL: try Servers.Server1.url())
 
         let app = Application(

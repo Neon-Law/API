@@ -3,9 +3,10 @@ import FluentSQLiteDriver
 struct CreateUsersTable: AsyncMigration {
     func prepare(on database: any Database) async throws {
         try await database.schema("users")
-            .id()
+            .field(.id, .int, .identifier(auto: true))
             .field("sub", .string, .required)
             .field("email", .string, .required)
+            .field("role", .string, .required, .sql(.default("customer")))
             .field("inserted_at", .datetime, .required)
             .field("updated_at", .datetime)
             .unique(on: "sub")
